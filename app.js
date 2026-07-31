@@ -353,7 +353,7 @@
     context.textAlign = "left";
     context.fillStyle = colors.text;
     context.font = `600 ${Math.max(8, width / 84)}px ${getComputedStyle(document.body).fontFamily}`;
-    context.fillText(`replanning step ${item.outcomes[state.horizon][planner].step}`, field.x + 12, field.y + field.height - 12);
+    context.fillText(`decision step ${item.outcomes[state.horizon][planner].step}`, field.x + 12, field.y + field.height - 12);
   }
 
   function drawHero() {
@@ -413,7 +413,7 @@
     });
     context.fillStyle = "rgba(243, 239, 230, 0.55)";
     context.font = `700 ${Math.max(9, width / 67)}px ${getComputedStyle(document.body).fontFamily}`;
-    context.fillText("candidate terminal latents", 22, height - 12);
+    context.fillText("possible future states", 22, height - 12);
     context.textAlign = "right";
     context.fillStyle = COLORS.cyan;
     context.fillText("HADP route", width - 22, 24);
@@ -438,10 +438,10 @@
 
   function renderEpisodeOptions() {
     dom.episodeSelect.innerHTML = "";
-    DATA.rolloutCases.forEach((item) => {
+    DATA.rolloutCases.forEach((item, index) => {
       const option = document.createElement("option");
       option.value = item.id;
-      option.textContent = `${item.label.toUpperCase()} · ${item.id} · ${item.title}`;
+      option.textContent = `Case ${index + 1} · ${item.label} · ${item.title}`;
       dom.episodeSelect.appendChild(option);
     });
     dom.episodeSelect.value = state.caseId;
@@ -457,7 +457,7 @@
     const item = getCurrentCase();
     const outcome = item.outcomes[state.horizon];
     dom.episodeSelect.value = item.id;
-    dom.rolloutCaseCode.textContent = `CASE ${item.id.toUpperCase()} · SEED ${item.seed} · H${state.horizon}`;
+    dom.rolloutCaseCode.textContent = `CASE ${item.label.toUpperCase()} · SEED ${item.seed} · H${state.horizon}`;
     dom.rolloutCaseTitle.textContent = item.title;
     dom.rolloutCaseCaption.textContent = item.caption;
     updateResultPill(dom.nativeResult, outcome.native.success);
@@ -485,8 +485,8 @@
     const selected = state.plannerMode === "native" ? nativeWinner : hadpWinner.candidate;
     const combined = state.plannerMode === "native" ? selected.distance : selected.distance + state.lambda * selected.direction;
     dom.weightValue.textContent = state.lambda.toFixed(1);
-    dom.selectedCandidate.textContent = selected.id;
-    dom.selectedCandidateNote.textContent = state.plannerMode === "native" ? "terminal distance only" : "HADP promotes directional alignment";
+    dom.selectedCandidate.textContent = `Plan ${selected.id.replace(/^C0?/, "")}`;
+    dom.selectedCandidateNote.textContent = state.plannerMode === "native" ? "distance only" : "HADP adds goal direction";
     dom.terminalScore.textContent = format(selected.distance, 2);
     dom.directionScore.textContent = format(selected.direction, 2);
     dom.combinedScore.textContent = format(combined, 2);
@@ -533,9 +533,9 @@
     drawT(context, goal.x, goal.y, -0.08, 0.62, COLORS.yellow, 1, "#b38a22");
     context.font = `800 ${Math.max(10, width / 76)}px ${getComputedStyle(document.body).fontFamily}`;
     context.fillStyle = COLORS.inkSoft;
-    context.fillText("current latent", current.x - 35, current.y + 28);
+    context.fillText("current state", current.x - 35, current.y + 28);
     context.fillStyle = "#97741b";
-    context.fillText("goal latent", goal.x - 28, goal.y - 38);
+    context.fillText("goal state", goal.x - 28, goal.y - 38);
 
     DATA.microscopeCandidates.forEach((candidate, index) => {
       const point = world(candidate);
@@ -567,7 +567,7 @@
       context.fill();
       context.fillStyle = isSelected ? COLORS.coralDeep : COLORS.inkSoft;
       context.font = `800 ${Math.max(9, width / 86)}px ${getComputedStyle(document.body).fontFamily}`;
-      context.fillText(candidate.id, point.x + 9, point.y - 8);
+      context.fillText(`Plan ${index + 1}`, point.x + 9, point.y - 8);
       context.fillStyle = COLORS.inkSoft;
       context.font = `600 ${Math.max(8, width / 101)}px ${getComputedStyle(document.body).fontFamily}`;
       context.fillText(state.plannerMode === "native" ? format(candidate.distance, 2) : format(score, 2), point.x + 9, point.y + 7);
@@ -575,7 +575,7 @@
     });
     context.fillStyle = COLORS.inkSoft;
     context.font = `800 ${Math.max(9, width / 84)}px ${getComputedStyle(document.body).fontFamily}`;
-    context.fillText(state.plannerMode === "native" ? "ranking by terminal distance" : `ranking by distance + ${state.lambda.toFixed(1)} × direction`, plot.x, height - 24);
+    context.fillText(state.plannerMode === "native" ? "distance only" : `distance + ${state.lambda.toFixed(1)} × goal direction`, plot.x, height - 24);
   }
 
   function renderDynamics() {
@@ -590,8 +590,8 @@
     dom.metricNext.textContent = format(model.next, 4);
     dom.metricRollout.textContent = format(model.rollout, 4);
     dom.metricStraightness.textContent = format(model.straightness, 3);
-    dom.epochDelta.textContent = `${signed(rolloutDelta, 3)} rollout AUC`;
-    dom.dynamicsReadout.textContent = `At epoch ${state.epoch}, residual prediction changes rollout AUC by ${signed(rolloutDelta, 3)} and encoded straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across epochs 1–10, validation-prediction AUC is 0.00753 for RLD vs 0.00979 for direct prediction.`;
+    dom.epochDelta.textContent = `${signed(rolloutDelta, 3)} long-run error`;
+    dom.dynamicsReadout.textContent = `At pass ${state.epoch}, residual prediction changes long-run error by ${signed(rolloutDelta, 3)} and path straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across passes 1–10, validation prediction AUC is 0.00753 for RLD vs 0.00979 for direct prediction.`;
     if (state.dynamicsModel === "residual") {
       dom.latentEquation.innerHTML = "<span>ẑ<sub>t+1</sub></span><b>=</b><span>z<sub>t</sub></span><b>+</b><span class=\"equation-accent\">Δẑ<sub>t</sub></span>";
     } else {
@@ -701,15 +701,15 @@
     }
     const legendY = height - 24;
     const legends = [
-      [COLORS.cyanDeep, "encoded trajectory"],
-      [model === "residual" ? COLORS.coral : COLORS.gray, "predicted trajectory"],
-      ["rgba(166, 126, 27, 0.72)", "target trajectory"]
+      [COLORS.cyanDeep, "observed path"],
+      [model === "residual" ? COLORS.coral : COLORS.gray, "model path"],
+      ["rgba(166, 126, 27, 0.72)", "target path"]
     ];
     let legendX = plot.x;
     legends.forEach(([color, label]) => {
       context.strokeStyle = color;
       context.lineWidth = 2.5;
-      context.setLineDash(label === "target trajectory" ? [4, 4] : []);
+      context.setLineDash(label === "target path" ? [4, 4] : []);
       context.beginPath();
       context.moveTo(legendX, legendY);
       context.lineTo(legendX + 19, legendY);
@@ -777,7 +777,7 @@
     context.font = `600 ${Math.max(8, width / 78)}px ${getComputedStyle(document.body).fontFamily}`;
     context.fillText("lower is better", plot.x, height - 10);
     context.textAlign = "right";
-    context.fillText("epoch 10", plot.x + plot.width, height - 10);
+    context.fillText("pass 10", plot.x + plot.width, height - 10);
     context.textAlign = "left";
   }
 
@@ -819,8 +819,8 @@
       context.fillText(sublabel, point.x, point.y + 63);
       context.textAlign = "left";
     };
-    circle(latentA, "zₜ", "current latent", "rgba(103, 214, 201, 0.24)", COLORS.cyanDeep);
-    circle(latentB, "zₜ₊₁", "next latent", "rgba(240, 206, 112, 0.25)", "#b38a22");
+    circle(latentA, "zₜ", "current state", "rgba(103, 214, 201, 0.24)", COLORS.cyanDeep);
+    circle(latentB, "zₜ₊₁", "next state", "rgba(240, 206, 112, 0.25)", "#b38a22");
     drawArrow(context, latentA.x + 44, latentA.y, latentB.x - 44, latentB.y, COLORS.coral, 3);
     context.fillStyle = COLORS.coralDeep;
     context.font = `800 ${Math.max(10, width / 72)}px ${fontFamily}`;
@@ -837,7 +837,7 @@
     context.fillStyle = COLORS.coralDeep;
     context.font = `800 ${Math.max(11, width / 65)}px ${fontFamily}`;
     context.textAlign = "center";
-    context.fillText("action decoder", decoder.x, decoder.y - 3);
+    context.fillText("action helper", decoder.x, decoder.y - 3);
     context.fillStyle = COLORS.inkSoft;
     context.font = `600 ${Math.max(9, width / 90)}px ${fontFamily}`;
     context.fillText("Dψ(dₜ) → âₜ", decoder.x, decoder.y + 20);
@@ -870,7 +870,7 @@
     context.fillStyle = ldadEnabled ? COLORS.cyanDeep : COLORS.inkSoft;
     context.font = `800 ${Math.max(9, width / 86)}px ${fontFamily}`;
     context.textAlign = "center";
-    context.fillText("training only · decoder discarded before CEM", width * 0.50, height - 39);
+    context.fillText("training only · helper removed before planning", width * 0.50, height - 39);
     context.textAlign = "left";
   }
 
@@ -894,17 +894,18 @@
     dom.galleryGrid.innerHTML = visible.map((item) => {
       const outcome = item.outcomes[state.horizon];
       const clip = item.clips && item.clips[0];
+      const caseNumber = DATA.rolloutCases.indexOf(item) + 1;
       return `<article class="gallery-card">
         <div class="gallery-preview"><canvas data-gallery-canvas="${item.id}" width="420" height="312"></canvas><span class="gallery-outcome ${item.filter}">${item.label}</span></div>
         <div class="gallery-body">
-          <span class="case-label">${item.id} · H${state.horizon}</span>
+          <span class="case-label">Case ${caseNumber} · H${state.horizon}</span>
           <h3>${item.title}</h3>
           <p>${item.caption}</p>
           <div class="case-mini-scores">
-            <div class="score-cell"><span>Native CEM · ${outcome.native.success ? "success" : "fail"} · trace</span><strong>${format(outcome.native.score, 2)}</strong></div>
-            <div class="score-cell hadp"><span>HADP · ${outcome.hadp.success ? "success" : "fail"} · trace</span><strong>${format(outcome.hadp.score, 2)}</strong></div>
+            <div class="score-cell"><span>Native CEM · ${outcome.native.success ? "success" : "fail"} · plan score</span><strong>${format(outcome.native.score, 2)}</strong></div>
+            <div class="score-cell hadp"><span>HADP · ${outcome.hadp.success ? "success" : "fail"} · plan score</span><strong>${format(outcome.hadp.score, 2)}</strong></div>
           </div>
-          <div class="clip-wrap"><label>recorded reference clip <span>A5 run ↗</span></label><video src="${clip}" muted loop playsinline preload="metadata" controls></video></div>
+          <div class="clip-wrap"><label>recorded reference clip</label><video src="${clip}" muted loop playsinline preload="metadata" controls></video></div>
         </div>
       </article>`;
     }).join("");

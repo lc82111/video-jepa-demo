@@ -7,8 +7,8 @@ window.PAPER_DATA = {
       filter: "rescue",
       label: "Rescue",
       seed: 42,
-      title: "Rescue at replanning step 3",
-      caption: "HADP selected a more directionally aligned candidate at replanning step 3.",
+      title: "Rescue at decision step 3",
+      caption: "At decision 3, HADP picked a move that pointed more directly toward the goal.",
       initial: { x: 0.16, y: 0.73 },
       goal: { x: 0.81, y: 0.28 },
       phase: 0.2,
@@ -30,7 +30,7 @@ window.PAPER_DATA = {
       label: "Rescue",
       seed: 42,
       title: "Rescue through the narrow side",
-      caption: "At step 5, HADP keeps the action sequence pointed toward the target instead of orbiting it.",
+      caption: "At decision 5, HADP kept moving toward the goal instead of circling it.",
       initial: { x: 0.22, y: 0.25 },
       goal: { x: 0.79, y: 0.73 },
       phase: 1.4,
@@ -52,7 +52,7 @@ window.PAPER_DATA = {
       label: "Loss",
       seed: 42,
       title: "A directional over-correction",
-      caption: "Native CEM reaches the target; HADP over-weights direction on this case and loses the episode.",
+      caption: "Native CEM succeeds here; HADP chooses a worse direction and misses.",
       initial: { x: 0.16, y: 0.56 },
       goal: { x: 0.78, y: 0.22 },
       phase: 2.4,
@@ -74,7 +74,7 @@ window.PAPER_DATA = {
       label: "Loss",
       seed: 42,
       title: "Close, but pointed away",
-      caption: "The directional term changes the winner at step 2, but the selected route misses the final contact.",
+      caption: "HADP changes the choice at decision 2, but this route misses the final contact.",
       initial: { x: 0.26, y: 0.78 },
       goal: { x: 0.76, y: 0.34 },
       phase: 3.1,
@@ -96,7 +96,7 @@ window.PAPER_DATA = {
       label: "Both succeed",
       seed: 42,
       title: "Two valid routes",
-      caption: "Both planners succeed; HADP still chooses the lower-directional-cost candidate.",
+      caption: "Both plans reach the goal; HADP chooses the one with better direction.",
       initial: { x: 0.19, y: 0.68 },
       goal: { x: 0.83, y: 0.37 },
       phase: 0.8,
@@ -118,7 +118,7 @@ window.PAPER_DATA = {
       label: "Both succeed",
       seed: 42,
       title: "Stable contact corridor",
-      caption: "The ranking changes, but both candidate sequences preserve the contact corridor to the goal.",
+      caption: "The choice changes, but both plans keep contact long enough to reach the goal.",
       initial: { x: 0.2, y: 0.28 },
       goal: { x: 0.82, y: 0.7 },
       phase: 1.9,
@@ -140,7 +140,7 @@ window.PAPER_DATA = {
       label: "Both fail",
       seed: 42,
       title: "Contact lost before the turn",
-      caption: "Neither candidate maintains contact long enough to reach the target; the planner choice is not enough.",
+      caption: "Neither plan keeps contact long enough to reach the goal; changing the score is not enough.",
       initial: { x: 0.13, y: 0.77 },
       goal: { x: 0.86, y: 0.27 },
       phase: 2.8,
@@ -162,7 +162,7 @@ window.PAPER_DATA = {
       label: "Both fail",
       seed: 42,
       title: "Goal behind an unrecoverable push",
-      caption: "Both planners converge to a bad contact mode. This failure stays visible in the demo.",
+      caption: "Both plans enter a bad contact mode. This failure stays visible in the demo.",
       initial: { x: 0.29, y: 0.19 },
       goal: { x: 0.73, y: 0.8 },
       phase: 4.2,
@@ -235,26 +235,26 @@ window.PAPER_DATA = {
 
   quantitative: {
     headline: {
-      title: "A1 residual + HADP vs A1 native",
+      title: "RLD + HADP compared with RLD only",
       columns: ["H100", "H150", "Aggregate"],
       rows: [
-        { label: "A1 native", values: ["13.3%", "14.0%", "13.7%"], kind: "base" },
-        { label: "A1 + HADP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
+        { label: "RLD only", values: ["13.3%", "14.0%", "13.7%"], kind: "base" },
+        { label: "RLD + HADP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
         { label: "Gain", values: ["+5.3 pp", "+2.7 pp", "+4.0 pp"], kind: "gain" }
       ],
       insight: "The aggregate 95% CI is [−2, +10] pp. The point estimate is encouraging, but the interval crosses zero.",
-      foot: "A19 · 3 evaluation seeds × 50 paired cases per horizon · locked λ=2 at H100 and λ=1 at H150"
+      foot: "3 evaluation seeds × 50 paired cases per horizon · locked λ=2 at H100 and λ=1 at H150"
     },
     transfer: {
-      title: "RLD/A14 + HADP transfer result",
+      title: "RLD + LDAD with and without HADP",
       columns: ["H100", "H150", "Aggregate"],
       rows: [
-        { label: "A14 native", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
-        { label: "A14 + HADP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
+        { label: "RLD + LDAD", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
+        { label: "RLD + LDAD + HADP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
         { label: "Planner change", values: ["+4.0 pp", "−0.7 pp", "+1.7 pp"], kind: "gain" }
       ],
       insight: "The transfer is horizon-dependent: positive at H100, negative at H150. It is evidence of a planning effect, not a consistent stack.",
-      foot: "A21 · RLD/A14 residual model · 3 evaluation seeds × 50 paired cases per horizon"
+      foot: "3 evaluation seeds × 50 paired cases per horizon"
     }
   }
 };

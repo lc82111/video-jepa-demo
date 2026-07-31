@@ -9,12 +9,12 @@
     "note": "Episode bootstrap intervals do not replace multi-seed uncertainty."
   },
   "headline": {
-    "experiment": "A1 residual x directional-planning factorial",
+    "experiment": "RLD + HADP planning comparison",
     "table": {
       "columns": ["H100", "H150", "Aggregate"],
       "rows": [
-        { "label": "A1 native", "values": [13.3, 14.0, 13.7], "unit": "%" },
-        { "label": "A1 + HADP", "values": [18.7, 16.7, 17.7], "unit": "%" },
+        { "label": "RLD only", "values": [13.3, 14.0, 13.7], "unit": "%" },
+        { "label": "RLD + HADP", "values": [18.7, 16.7, 17.7], "unit": "%" },
         { "label": "Gain", "values": [5.3, 2.7, 4.0], "unit": "percentage points" }
       ]
     },
@@ -23,7 +23,7 @@
     "locked_directional_weight": { "H100": 2, "H150": 1 }
   },
   "transfer": {
-    "experiment": "RLD/A14 + HADP",
+    "experiment": "RLD + LDAD with and without HADP",
     "native_percent": { "H100": 15.3, "H150": 13.3, "Aggregate": 14.3 },
     "hadp_percent": { "H100": 19.3, "H150": 12.7, "Aggregate": 16.0 },
     "interpretation": "Horizon-dependent transfer result, not a consistent stack."
@@ -50,8 +50,8 @@
   },
   "boundaries": [
     "Continuous horizon interpolation was not validated.",
-    "RLD/A14 and HADP did not consistently stack.",
+    "LDAD and HADP did not consistently stack.",
     "Current evidence uses one training seed.",
-    "A19 found no residual x directional-planning interaction."
+    "The interaction test found no reliable interaction between residual dynamics and directional planning."
   ]
 }

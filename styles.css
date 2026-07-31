@@ -2180,6 +2180,29 @@ input[type="range"] {
   padding-bottom: 88px;
 }
 
+.reader-glossary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+  padding: 14px 17px;
+  box-shadow: none;
+  background: rgba(255, 253, 248, 0.58);
+}
+
+.reader-glossary span {
+  color: var(--ink-soft);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.reader-glossary b {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink);
+  font-size: 10px;
+}
+
 .paper-map {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2521,7 +2544,8 @@ input[type="range"] {
 @media (max-width: 980px) {
   .paper-map,
   .paper-results-grid,
-  .ldad-layout {
+  .ldad-layout,
+  .reader-glossary {
     grid-template-columns: 1fr;
   }
 
