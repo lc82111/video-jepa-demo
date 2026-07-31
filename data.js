@@ -236,24 +236,24 @@ window.PAPER_DATA = {
   quantitative: {
     headline: {
       title: "RLD + HADP compared with RLD only",
-      columns: ["H100", "H150", "Aggregate"],
+      columns: ["H=100", "H=150", "Aggregate"],
       rows: [
         { label: "RLD only", values: ["13.3%", "14.0%", "13.7%"], kind: "base" },
         { label: "RLD + HADP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
         { label: "Gain", values: ["+5.3 pp", "+2.7 pp", "+4.0 pp"], kind: "gain" }
       ],
       insight: "The aggregate 95% CI is [−2, +10] pp. The point estimate is encouraging, but the interval crosses zero.",
-      foot: "3 evaluation seeds × 50 paired cases per horizon · locked λ=2 at H100 and λ=1 at H150"
+      foot: "3 evaluation seeds × 50 paired cases per horizon · locked λ=2 at H=100 and λ=1 at H=150"
     },
     transfer: {
       title: "RLD + LDAD with and without HADP",
-      columns: ["H100", "H150", "Aggregate"],
+      columns: ["H=100", "H=150", "Aggregate"],
       rows: [
         { label: "RLD + LDAD", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
         { label: "RLD + LDAD + HADP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
         { label: "Planner change", values: ["+4.0 pp", "−0.7 pp", "+1.7 pp"], kind: "gain" }
       ],
-      insight: "The transfer is horizon-dependent: positive at H100, negative at H150. It is evidence of a planning effect, not a consistent stack.",
+      insight: "The transfer is horizon-dependent: positive at H=100, negative at H=150. It is evidence of a planning effect, not a consistent stack.",
       foot: "3 evaluation seeds × 50 paired cases per horizon"
     }
   }

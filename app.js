@@ -413,7 +413,7 @@
     });
     context.fillStyle = "rgba(243, 239, 230, 0.55)";
     context.font = `700 ${Math.max(9, width / 67)}px ${getComputedStyle(document.body).fontFamily}`;
-    context.fillText("possible future states", 22, height - 12);
+    context.fillText("candidate terminal latents", 22, height - 12);
     context.textAlign = "right";
     context.fillStyle = COLORS.cyan;
     context.fillText("HADP route", width - 22, 24);
@@ -457,7 +457,7 @@
     const item = getCurrentCase();
     const outcome = item.outcomes[state.horizon];
     dom.episodeSelect.value = item.id;
-    dom.rolloutCaseCode.textContent = `CASE ${item.label.toUpperCase()} · SEED ${item.seed} · H${state.horizon}`;
+    dom.rolloutCaseCode.textContent = `CASE ${item.label.toUpperCase()} · SEED ${item.seed} · H=${state.horizon}`;
     dom.rolloutCaseTitle.textContent = item.title;
     dom.rolloutCaseCaption.textContent = item.caption;
     updateResultPill(dom.nativeResult, outcome.native.success);
@@ -486,7 +486,7 @@
     const combined = state.plannerMode === "native" ? selected.distance : selected.distance + state.lambda * selected.direction;
     dom.weightValue.textContent = state.lambda.toFixed(1);
     dom.selectedCandidate.textContent = `Plan ${selected.id.replace(/^C0?/, "")}`;
-    dom.selectedCandidateNote.textContent = state.plannerMode === "native" ? "distance only" : "HADP adds goal direction";
+    dom.selectedCandidateNote.textContent = state.plannerMode === "native" ? "native terminal goal cost" : "HADP adds directional cost";
     dom.terminalScore.textContent = format(selected.distance, 2);
     dom.directionScore.textContent = format(selected.direction, 2);
     dom.combinedScore.textContent = format(combined, 2);
@@ -533,9 +533,9 @@
     drawT(context, goal.x, goal.y, -0.08, 0.62, COLORS.yellow, 1, "#b38a22");
     context.font = `800 ${Math.max(10, width / 76)}px ${getComputedStyle(document.body).fontFamily}`;
     context.fillStyle = COLORS.inkSoft;
-    context.fillText("current state", current.x - 35, current.y + 28);
+    context.fillText("current latent", current.x - 35, current.y + 28);
     context.fillStyle = "#97741b";
-    context.fillText("goal state", goal.x - 28, goal.y - 38);
+    context.fillText("goal latent", goal.x - 28, goal.y - 38);
 
     DATA.microscopeCandidates.forEach((candidate, index) => {
       const point = world(candidate);
@@ -575,7 +575,7 @@
     });
     context.fillStyle = COLORS.inkSoft;
     context.font = `800 ${Math.max(9, width / 84)}px ${getComputedStyle(document.body).fontFamily}`;
-    context.fillText(state.plannerMode === "native" ? "distance only" : `distance + ${state.lambda.toFixed(1)} × goal direction`, plot.x, height - 24);
+    context.fillText(state.plannerMode === "native" ? "ranking by terminal goal distance" : `ranking by terminal distance + ${state.lambda.toFixed(1)} × directional cost`, plot.x, height - 24);
   }
 
   function renderDynamics() {
@@ -590,8 +590,8 @@
     dom.metricNext.textContent = format(model.next, 4);
     dom.metricRollout.textContent = format(model.rollout, 4);
     dom.metricStraightness.textContent = format(model.straightness, 3);
-    dom.epochDelta.textContent = `${signed(rolloutDelta, 3)} long-run error`;
-    dom.dynamicsReadout.textContent = `At pass ${state.epoch}, residual prediction changes long-run error by ${signed(rolloutDelta, 3)} and path straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across passes 1–10, validation prediction AUC is 0.00753 for RLD vs 0.00979 for direct prediction.`;
+    dom.epochDelta.textContent = `${signed(rolloutDelta, 3)} rollout MSE AUC`;
+    dom.dynamicsReadout.textContent = `At epoch ${state.epoch}, RLD changes rollout MSE AUC by ${signed(rolloutDelta, 3)} and temporal straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across epochs 1–10, validation-prediction AUC is 0.00753 for RLD vs 0.00979 for direct prediction.`;
     if (state.dynamicsModel === "residual") {
       dom.latentEquation.innerHTML = "<span>ẑ<sub>t+1</sub></span><b>=</b><span>z<sub>t</sub></span><b>+</b><span class=\"equation-accent\">Δẑ<sub>t</sub></span>";
     } else {
@@ -701,15 +701,15 @@
     }
     const legendY = height - 24;
     const legends = [
-      [COLORS.cyanDeep, "observed path"],
-      [model === "residual" ? COLORS.coral : COLORS.gray, "model path"],
-      ["rgba(166, 126, 27, 0.72)", "target path"]
+      [COLORS.cyanDeep, "encoded trajectory"],
+      [model === "residual" ? COLORS.coral : COLORS.gray, "predicted trajectory"],
+      ["rgba(166, 126, 27, 0.72)", "target trajectory"]
     ];
     let legendX = plot.x;
     legends.forEach(([color, label]) => {
       context.strokeStyle = color;
       context.lineWidth = 2.5;
-      context.setLineDash(label === "target path" ? [4, 4] : []);
+      context.setLineDash(label === "target trajectory" ? [4, 4] : []);
       context.beginPath();
       context.moveTo(legendX, legendY);
       context.lineTo(legendX + 19, legendY);
@@ -777,7 +777,7 @@
     context.font = `600 ${Math.max(8, width / 78)}px ${getComputedStyle(document.body).fontFamily}`;
     context.fillText("lower is better", plot.x, height - 10);
     context.textAlign = "right";
-    context.fillText("pass 10", plot.x + plot.width, height - 10);
+    context.fillText("epoch 10", plot.x + plot.width, height - 10);
     context.textAlign = "left";
   }
 
@@ -819,8 +819,8 @@
       context.fillText(sublabel, point.x, point.y + 63);
       context.textAlign = "left";
     };
-    circle(latentA, "zₜ", "current state", "rgba(103, 214, 201, 0.24)", COLORS.cyanDeep);
-    circle(latentB, "zₜ₊₁", "next state", "rgba(240, 206, 112, 0.25)", "#b38a22");
+    circle(latentA, "zₜ", "current latent", "rgba(103, 214, 201, 0.24)", COLORS.cyanDeep);
+    circle(latentB, "zₜ₊₁", "next latent", "rgba(240, 206, 112, 0.25)", "#b38a22");
     drawArrow(context, latentA.x + 44, latentA.y, latentB.x - 44, latentB.y, COLORS.coral, 3);
     context.fillStyle = COLORS.coralDeep;
     context.font = `800 ${Math.max(10, width / 72)}px ${fontFamily}`;
@@ -837,7 +837,7 @@
     context.fillStyle = COLORS.coralDeep;
     context.font = `800 ${Math.max(11, width / 65)}px ${fontFamily}`;
     context.textAlign = "center";
-    context.fillText("action helper", decoder.x, decoder.y - 3);
+    context.fillText("action decoder", decoder.x, decoder.y - 3);
     context.fillStyle = COLORS.inkSoft;
     context.font = `600 ${Math.max(9, width / 90)}px ${fontFamily}`;
     context.fillText("Dψ(dₜ) → âₜ", decoder.x, decoder.y + 20);
@@ -870,7 +870,7 @@
     context.fillStyle = ldadEnabled ? COLORS.cyanDeep : COLORS.inkSoft;
     context.font = `800 ${Math.max(9, width / 86)}px ${fontFamily}`;
     context.textAlign = "center";
-    context.fillText("training only · helper removed before planning", width * 0.50, height - 39);
+    context.fillText("training only · decoder discarded at inference", width * 0.50, height - 39);
     context.textAlign = "left";
   }
 
@@ -886,7 +886,7 @@
 
   function renderFigureContext() {
     const metrics = DATA.figureMetrics.hadpMechanism;
-    dom.figureContextCopy.textContent = `The locked mechanism figure shows a ${metrics.changedDecisions[100]} decision-change rate at H100 and ${metrics.changedDecisions[150]} at H150, with directional cost reductions of 1.9% and 1.3%.`;
+    dom.figureContextCopy.textContent = `The mechanism figure shows ${metrics.changedDecisions[100]} of CEM decisions changing at H=100 and ${metrics.changedDecisions[150]} at H=150. The selected median-normalized directional cost falls by 1.9% and 1.3%.`;
   }
 
   function renderGallery() {
@@ -898,7 +898,7 @@
       return `<article class="gallery-card">
         <div class="gallery-preview"><canvas data-gallery-canvas="${item.id}" width="420" height="312"></canvas><span class="gallery-outcome ${item.filter}">${item.label}</span></div>
         <div class="gallery-body">
-          <span class="case-label">Case ${caseNumber} · H${state.horizon}</span>
+          <span class="case-label">Case ${caseNumber} · H=${state.horizon}</span>
           <h3>${item.title}</h3>
           <p>${item.caption}</p>
           <div class="case-mini-scores">

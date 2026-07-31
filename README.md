@@ -1,4 +1,4 @@
-# Learning Better Latent Dynamics, Planning Better Paths
+# Improving World-Model with Residual Latent Transitions, Action-Discriminative Representations, and Horizon-Adaptive Planning
 
 Static GitHub Pages companion for the Push-T study of Residual Latent Dynamics (RLD), Latent-Displacement Action Decoding (LDAD), and Horizon-Adaptive Directional Planning (HADP).
 

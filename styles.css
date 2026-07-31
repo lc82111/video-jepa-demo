@@ -214,12 +214,12 @@ button {
 }
 
 .hero h1 {
-  max-width: 690px;
+  max-width: 720px;
   margin: 20px 0 24px;
   color: var(--ink);
-  font-size: clamp(45px, 6vw, 80px);
+  font-size: clamp(35px, 4.2vw, 58px);
   font-weight: 500;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.055em;
   line-height: 0.98;
 }
 
@@ -227,7 +227,7 @@ button {
   color: var(--coral-deep);
   font-family: var(--serif);
   font-weight: 400;
-  letter-spacing: -0.07em;
+  letter-spacing: -0.06em;
 }
 
 .hero-lede {
@@ -2003,7 +2003,7 @@ input[type="range"] {
   }
 
   .hero h1 {
-    font-size: clamp(42px, 13vw, 68px);
+    font-size: clamp(33px, 10.8vw, 56px);
   }
 
   .hero-lede {

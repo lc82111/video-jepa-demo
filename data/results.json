@@ -1,5 +1,5 @@
 {
-  "title": "Learning Better Latent Dynamics, Planning Better Paths",
+  "title": "Improving World-Model with Residual Latent Transitions, Action-Discriminative Representations, and Horizon-Adaptive Planning",
   "provenance": {
     "training_seed": 3072,
     "control_cases": 100,
