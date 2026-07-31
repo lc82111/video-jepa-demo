@@ -3,10 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="An interactive browser demo for residual latent dynamics and horizon-adaptive directional planning on Push-T."
-    />
+    <meta name="description" content="Interactive companion to Improving World-Model with Residual Latent Transitions, Action-Discriminative Representations, and Horizon-Adaptive Planning." />
     <meta name="theme-color" content="#0d1826" />
     <title>Learning Better Latent Dynamics, Planning Better Paths</title>
     <link rel="stylesheet" href="./styles.css" />
@@ -14,357 +11,93 @@
   <body>
     <div class="noise" aria-hidden="true"></div>
     <header class="site-nav">
-      <a class="brand" href="#top" aria-label="Back to the top">
-        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>latent / path</span>
-      </a>
+      <a class="brand" href="#top" aria-label="Back to the top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>latent / path</span></a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#rollouts">Rollouts</a>
-        <a href="#microscope">Microscope</a>
-        <a href="#dynamics">Dynamics</a>
-        <a href="#evidence">Evidence</a>
+        <a href="#story">Story</a>
+        <a href="#rollouts">Demo</a>
+        <a href="#evidence">Results</a>
+        <a href="#boundaries">Limits</a>
       </nav>
-      <a class="nav-cta" href="#boundaries">Read the limits <span aria-hidden="true">↘</span></a>
+      <a class="nav-cta" href="#rollouts">Start with Push-T <span aria-hidden="true">↘</span></a>
     </header>
 
     <main id="top">
       <section class="hero section-shell">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> Push-T · browser-only research companion</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Interactive paper companion</p>
           <h1>Learning better latent dynamics,<br /><em>planning better paths.</em></h1>
-          <p class="hero-lede">
-            The learned model stays fixed. The planner changes how it ranks candidates. Scrub the same
-            initial state, goal, seed, and model side by side—then inspect the latent dynamics and the
-            confidence interval behind the result.
-          </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#rollouts">Open the synchronized rollout <span aria-hidden="true">↗</span></a>
-            <a class="button button-quiet" href="#evidence">Jump to the numbers</a>
-          </div>
-          <div class="hero-proof" aria-label="Demo facts">
-            <span><b>100</b> paired cases</span>
-            <span><b>H100 / H150</b> tested horizons</span>
-            <span><b>1</b> training seed</span>
-          </div>
+          <p class="paper-title">Improving World-Model with Residual Latent Transitions, Action-Discriminative Representations, and Horizon-Adaptive Planning</p>
+          <p class="hero-lede">Offline visual control has three separate bottlenecks: learning the transition, keeping action information in the latent change, and ranking plans across horizons. This page follows those three ideas in the same order as the paper.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#rollouts">Watch the Push-T comparison <span aria-hidden="true">↗</span></a><a class="button button-quiet" href="#story">See the three changes</a></div>
+          <div class="hero-proof" aria-label="Paper facts"><span><b>RLD</b> learns Δz</span><span><b>LDAD</b> decodes action from Δz</span><span><b>HADP</b> reranks CEM</span></div>
         </div>
         <div class="hero-visual panel-dark" aria-label="Abstract planner preview">
-          <div class="hero-visual-topline">
-            <span class="mono-label">LIVE PREVIEW / A1 + HADP</span>
-            <span class="tiny-status"><i></i> replayable</span>
-          </div>
+          <div class="hero-visual-topline"><span class="mono-label">PAPER MAP / MODEL → LATENT → PLAN</span><span class="tiny-status"><i></i> browser demo</span></div>
           <canvas id="hero-canvas" width="620" height="350"></canvas>
-          <div class="hero-visual-footer">
-            <div>
-              <span class="micro-label">same latent model</span>
-              <strong>different candidate ranking</strong>
-            </div>
-            <div class="hero-metric"><strong>+4.0</strong><span>pp aggregate</span></div>
-          </div>
+          <div class="hero-visual-footer"><div><span class="micro-label">headline diagnostic</span><strong>34% vs 16% at epoch 1</strong></div><div class="hero-metric"><strong>19 / 16%</strong><span>full method · H100 / H150</span></div></div>
         </div>
+      </section>
+
+      <section class="section-shell story-section" id="story">
+        <div class="section-head section-head-wide">
+          <div><p class="section-kicker"><span>00</span> The paper in one view</p><h2>Three changes, three places in the control loop.</h2></div>
+          <p class="section-intro">Read the colors as a map: teal changes what the model learns, coral makes the latent displacement action-aware, and yellow changes how the planner chooses among model predictions.</p>
+        </div>
+        <div class="paper-map">
+          <article class="stage-card stage-rld"><div class="stage-top"><span>01 / RLD</span><b>training target</b></div><h3>Make the prediction local.</h3><p>Instead of predicting the whole next latent, predict its change and add it to the current latent.</p><div class="stage-equation">ẑ<sub>t+1</sub> = z<sub>t</sub> + Δẑ<sub>t</sub></div><div class="stage-result"><strong>34% vs 16%</strong><span>Push-T success at epoch 1</span></div></article>
+          <article class="stage-card stage-ldad"><div class="stage-top"><span>02 / LDAD</span><b>training-only signal</b></div><h3>Make the change explain the action.</h3><p>Decode the recorded action from z<sub>t+1</sub> − z<sub>t</sub>. The decoder is discarded before planning.</p><div class="stage-equation">d<sub>t</sub> = z<sub>t+1</sub> − z<sub>t</sub> → â<sub>t</sub></div><div class="stage-result"><strong>84% → 93%</strong><span>H5 action-ranking accuracy</span></div></article>
+          <article class="stage-card stage-hadp"><div class="stage-top"><span>03 / HADP</span><b>inference-time cost</b></div><h3>Rank the same predictions by direction.</h3><p>Add a horizon-dependent directional cost to CEM. The learned model remains unchanged.</p><div class="stage-equation">C<sub>goal</sub> + w<sub>H</sub>C<sub>dir</sub></div><div class="stage-result"><strong>40.9%</strong><span>of CEM decisions changed</span></div></article>
+        </div>
+        <div class="method-separation panel"><div><span class="mono-label">MODEL SIDE</span><strong>RLD + LDAD</strong><small>shape the latent dynamics during training</small></div><div class="separation-arrow">→</div><div><span class="mono-label">PLANNER SIDE</span><strong>HADP</strong><small>reranks candidate rollouts at inference</small></div><p>Keeping these roles separate is the paper’s central experimental choice: a better representation and a different planner should not be credited as the same intervention.</p></div>
       </section>
 
       <section class="section-shell section-first" id="rollouts">
-        <div class="section-head section-head-wide">
-          <div>
-            <p class="section-kicker"><span>01</span> Synchronized Push-T rollout</p>
-            <h2>Watch the planner make the same world-model prediction—then choose differently.</h2>
-          </div>
-          <p class="section-intro">
-            These browser-rendered representative traces keep the initial state, target, seed, horizon, and
-            model aligned. HADP adds a directional term to the CEM score; it does not retrain or alter the
-            latent dynamics. The figure-checked exported numbers are reported below.
-          </p>
-        </div>
-
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>01</span> Start here · visible behavior</p><h2>Same world model. Different plan.</h2></div><p class="section-intro">Watch a representative Push-T case before reading the plots. Both panels share the initial state, goal, seed, horizon, and latent model; HADP only changes candidate ranking.</p></div>
         <div class="panel rollout-panel">
-          <div class="control-strip">
-            <div class="control-block">
-              <span class="control-label">Horizon</span>
-              <div class="segmented" role="group" aria-label="Planning horizon">
-                <button class="segment is-active" data-horizon="100" type="button">H100</button>
-                <button class="segment" data-horizon="150" type="button">H150</button>
-              </div>
-            </div>
-            <div class="control-block episode-control">
-              <label class="control-label" for="episode-select">Episode selector</label>
-              <select id="episode-select" class="select-control" aria-label="Choose a representative episode"></select>
-            </div>
-            <div class="case-count"><strong>8</strong><span>representative cases<br />including failures</span></div>
-          </div>
-
-          <div class="rollout-context">
-            <div>
-              <span class="mono-label" id="rollout-case-code">CASE RESCUE-03 · SEED 42</span>
-              <h3 id="rollout-case-title">Rescue at replanning step 3</h3>
-              <p id="rollout-case-caption">HADP selected a more directionally aligned candidate at replanning step 3.</p>
-            </div>
-            <div class="context-chips">
-              <span class="context-chip"><i class="dot dot-cyan"></i> current state</span>
-              <span class="context-chip"><i class="dot dot-yellow"></i> target state</span>
-              <span class="context-chip"><i class="dot dot-coral"></i> planned action sequence</span>
-            </div>
-          </div>
-
-          <div class="planner-grid">
-            <article class="planner-card">
-              <div class="planner-card-head">
-                <div><span class="planner-index">A</span><span class="planner-name">Native CEM</span></div>
-                <span class="result-pill result-pill-muted" id="native-result">FAIL</span>
-              </div>
-              <canvas id="native-rollout" class="rollout-canvas" width="640" height="360"></canvas>
-              <div class="planner-card-foot"><span>trace distance</span><strong id="native-distance">0.38</strong><span class="foot-sep">·</span><span>trace score</span><strong id="native-score">0.38</strong></div>
-            </article>
-            <article class="planner-card planner-card-accent">
-              <div class="planner-card-head">
-                <div><span class="planner-index planner-index-accent">B</span><span class="planner-name">HADP</span><span class="planner-tag">direction-aware</span></div>
-                <span class="result-pill result-pill-success" id="hadp-result">SUCCESS</span>
-              </div>
-              <canvas id="hadp-rollout" class="rollout-canvas" width="640" height="360"></canvas>
-              <div class="planner-card-foot"><span>trace distance</span><strong id="hadp-distance">0.24</strong><span class="foot-sep">·</span><span>trace score</span><strong id="hadp-score">0.29</strong></div>
-            </article>
-          </div>
-
-          <div class="rollout-controls">
-            <button class="icon-button" id="play-rollout" type="button" aria-label="Play rollout"><span class="play-icon">▶</span><span id="play-label">Play</span></button>
-            <button class="text-button" id="replay-rollout" type="button">↺ Replay</button>
-            <div class="scrub-wrap">
-              <label class="sr-only" for="rollout-scrub">Scrub synchronized rollout</label>
-              <input id="rollout-scrub" type="range" min="0" max="64" value="0" step="1" />
-              <div class="scrub-ticks"><span>initial state</span><span id="frame-label">frame 1 / 64</span><span>terminal check</span></div>
-            </div>
-            <span class="replay-note"><i></i> both panels scrub in lockstep</span>
-          </div>
+          <div class="control-strip"><div class="control-block"><span class="control-label">Horizon</span><div class="segmented" role="group" aria-label="Planning horizon"><button class="segment is-active" data-horizon="100" type="button">H100</button><button class="segment" data-horizon="150" type="button">H150</button></div></div><div class="control-block episode-control"><label class="control-label" for="episode-select">Representative case</label><select id="episode-select" class="select-control" aria-label="Choose a representative episode"></select></div><div class="case-count"><strong>8</strong><span>cases<br />including failures</span></div></div>
+          <div class="rollout-context"><div><span class="mono-label" id="rollout-case-code">CASE RESCUE-03 · SEED 42</span><h3 id="rollout-case-title">Rescue at replanning step 3</h3><p id="rollout-case-caption">HADP selected a more directionally aligned candidate at replanning step 3.</p></div><div class="context-chips"><span class="context-chip"><i class="dot dot-cyan"></i> current</span><span class="context-chip"><i class="dot dot-yellow"></i> goal</span><span class="context-chip"><i class="dot dot-coral"></i> action sequence</span></div></div>
+          <div class="planner-grid"><article class="planner-card"><div class="planner-card-head"><div><span class="planner-index">A</span><span class="planner-name">Native CEM</span></div><span class="result-pill result-pill-muted" id="native-result">FAIL</span></div><canvas id="native-rollout" class="rollout-canvas" width="640" height="360"></canvas><div class="planner-card-foot"><span>trace distance</span><strong id="native-distance">0.38</strong><span class="foot-sep">·</span><span>trace score</span><strong id="native-score">0.38</strong></div></article><article class="planner-card planner-card-accent"><div class="planner-card-head"><div><span class="planner-index planner-index-accent">B</span><span class="planner-name">HADP</span><span class="planner-tag">direction-aware</span></div><span class="result-pill result-pill-success" id="hadp-result">SUCCESS</span></div><canvas id="hadp-rollout" class="rollout-canvas" width="640" height="360"></canvas><div class="planner-card-foot"><span>trace distance</span><strong id="hadp-distance">0.24</strong><span class="foot-sep">·</span><span>trace score</span><strong id="hadp-score">0.29</strong></div></article></div>
+          <div class="rollout-controls"><button class="icon-button" id="play-rollout" type="button" aria-label="Play rollout"><span class="play-icon">▶</span><span id="play-label">Play</span></button><button class="text-button" id="replay-rollout" type="button">↺ Replay</button><div class="scrub-wrap"><label class="sr-only" for="rollout-scrub">Scrub synchronized rollout</label><input id="rollout-scrub" type="range" min="0" max="64" value="0" step="1" /><div class="scrub-ticks"><span>initial state</span><span id="frame-label">frame 1 / 64</span><span>terminal check</span></div></div><span class="replay-note"><i></i> panels scrub in lockstep</span></div>
         </div>
-
-        <div class="section-note">
-          <span class="note-mark">↳</span>
-          <p><strong>What to look for.</strong> On a rescue case, native CEM can pick a candidate that is close to the goal but pointed the wrong way. HADP promotes the candidate whose movement direction agrees with the desired goal direction. The trace scores are compact demo metadata; use the quantitative panel for reported evaluation values.</p>
-        </div>
-      </section>
-
-      <section class="section-shell section-tint" id="microscope">
-        <div class="section-head section-head-wide">
-          <div>
-            <p class="section-kicker"><span>02</span> HADP planning microscope</p>
-            <h2>One CEM step, opened up.</h2>
-          </div>
-          <p class="section-intro">
-            Every dot is a candidate terminal latent. The desired direction is fixed; only the ranking rule
-            changes. Turn the weight to see when the selected candidate flips.
-          </p>
-        </div>
-
-        <div class="microscope-layout">
-          <div class="panel microscope-plot-panel">
-            <div class="plot-toolbar">
-              <span class="mono-label">CEM ITERATION 03 / 08</span>
-              <div class="toggle-group" role="group" aria-label="Planner used for candidate ranking">
-                <button class="toggle-button" data-planner-mode="native" type="button">Native CEM</button>
-                <button class="toggle-button is-active" data-planner-mode="hadp" type="button">HADP</button>
-              </div>
-            </div>
-            <canvas id="microscope-canvas" width="820" height="500"></canvas>
-            <div class="plot-legend">
-              <span><i class="legend-line legend-line-goal"></i> desired goal direction</span>
-              <span><i class="legend-dot legend-dot-candidate"></i> candidate terminal latent</span>
-              <span><i class="legend-dot legend-dot-selected"></i> selected candidate</span>
-            </div>
-          </div>
-          <aside class="panel microscope-aside">
-            <div class="aside-heading"><span class="mono-label">RANKING RULE</span><span class="lock-badge">LOCKED BY HORIZON</span></div>
-            <div class="weight-row"><span>directional weight <b>λ</b></span><output id="weight-value">2.0</output></div>
-            <div class="range-wrap">
-              <input id="weight-slider" type="range" min="0" max="3" value="2" step="0.1" aria-label="Directional cost weight" />
-              <div class="range-markers" aria-hidden="true"><span style="left: 33.33%">H150 · 1</span><span style="left: 66.66%">H100 · 2</span></div>
-            </div>
-            <div class="locked-horizons">
-              <button class="locked-horizon" data-horizon="150" type="button"><span>H150</span><strong>λ = 1</strong></button>
-              <button class="locked-horizon is-active" data-horizon="100" type="button"><span>H100</span><strong>λ = 2</strong></button>
-            </div>
-            <button class="button button-dark-wide" id="microscope-replay" type="button">Replay candidate ranking <span aria-hidden="true">↗</span></button>
-
-            <div class="selected-candidate">
-              <span class="micro-label">SELECTED CANDIDATE</span>
-              <div class="selected-line"><strong id="selected-candidate">C06</strong><span id="selected-candidate-note">HADP promotes directional alignment</span></div>
-            </div>
-            <div class="score-stack">
-              <div class="score-row"><div><span>terminal goal distance</span><small>lower is better</small></div><strong id="terminal-score">0.19</strong></div>
-              <div class="score-bar"><i id="terminal-score-bar" style="width: 38%"></i></div>
-              <div class="score-row"><div><span>directional cost</span><small>alignment penalty</small></div><strong id="direction-score">0.08</strong></div>
-              <div class="score-bar score-bar-coral"><i id="direction-score-bar" style="width: 22%"></i></div>
-              <div class="score-total"><span>combined score</span><strong id="combined-score">0.35</strong></div>
-            </div>
-            <p class="aside-footnote">HADP changes candidate ranking, not the learned model.</p>
-          </aside>
-        </div>
-      </section>
-
-      <section class="section-shell" id="dynamics">
-        <div class="section-head section-head-wide">
-          <div>
-            <p class="section-kicker"><span>03</span> Residual latent dynamics explorer</p>
-            <h2>Predict the change, not the whole next state.</h2>
-          </div>
-          <p class="section-intro">
-            Scrub the recorded training trajectory from epoch 1 to 10. Residual prediction starts with a
-            stronger optimization signal; by epoch 10, the gap is narrower and the control evidence is not
-            a clean separation.
-          </p>
-        </div>
-
-        <div class="dynamics-toolbar panel">
-          <div class="control-block">
-            <span class="control-label">Transition target</span>
-            <div class="segmented" role="group" aria-label="Transition target">
-              <button class="segment" data-dynamics-model="direct" type="button">Direct next latent</button>
-              <button class="segment is-active" data-dynamics-model="residual" type="button">Residual prediction</button>
-            </div>
-          </div>
-          <div class="epoch-control">
-            <label class="control-label" for="epoch-slider">Training epoch <output id="epoch-value">1</output> / 10</label>
-            <input id="epoch-slider" type="range" min="1" max="10" value="1" step="1" />
-          </div>
-          <div class="epoch-callout"><span>early advantage</span><strong id="epoch-delta">−0.202 rollout AUC</strong></div>
-        </div>
-
-        <div class="dynamics-layout">
-          <div class="panel latent-visual-panel">
-            <div class="plot-toolbar"><span class="mono-label">SCHEMATIC LATENT PLANE</span><span class="plot-hint">metrics below are exported</span></div>
-            <canvas id="latent-canvas" width="820" height="480"></canvas>
-            <div class="latent-equation" id="latent-equation"><span>ẑ<sub>t+1</sub></span><b>=</b><span>z<sub>t</sub></span><b>+</b><span class="equation-accent">Δẑ<sub>t</sub></span></div>
-            <p class="plot-caption">The residual arrow is the learned change vector. The target trajectory is the held-out encoded trajectory.</p>
-          </div>
-          <aside class="dynamics-aside">
-            <div class="metric-grid">
-              <div class="metric-card"><span>next-latent error</span><strong id="metric-next">0.0241</strong><small>validation prediction loss</small></div>
-              <div class="metric-card metric-card-coral"><span>rollout error</span><strong id="metric-rollout">0.7873</strong><small>AUC · lower is better</small></div>
-              <div class="metric-card metric-card-teal"><span>temporal straightness</span><strong id="metric-straightness">0.368</strong><small>encoded trajectory · higher is better</small></div>
-            </div>
-            <div class="panel mini-chart-panel">
-              <div class="mini-chart-head"><span class="mono-label">ROLLOUT AUC ACROSS EPOCHS</span><span class="chart-key"><i class="key-direct"></i> direct <i class="key-residual"></i> residual</span></div>
-              <canvas id="dynamics-chart" width="650" height="270"></canvas>
-            </div>
-            <div class="dynamics-readout" id="dynamics-readout">At epoch 1, residual prediction lowers rollout AUC by 0.202 and raises encoded straightness by 0.101 on this one-seed trace.</div>
-          </aside>
-        </div>
+        <div class="section-note"><span class="note-mark">↳</span><p><strong>How to read it.</strong> A rescue is not proof that HADP always wins. Use the selector to inspect rescues, losses, both-success cases, and both-fail cases before moving to the aggregate results.</p></div>
       </section>
 
       <section class="section-shell evidence-section" id="evidence">
-        <div class="section-head section-head-wide">
-          <div>
-            <p class="section-kicker"><span>04</span> Quantitative results</p>
-            <h2>Promising, not statistically established.</h2>
-          </div>
-          <p class="section-intro">
-            The primary result is an honest paired summary: positive point estimates at both tested horizons,
-            with an aggregate interval that still crosses zero.
-          </p>
-        </div>
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>02</span> Results · paper headline first</p><h2>The rounded headline and the controlled ablation are different views.</h2></div><p class="section-intro">The paper’s headline combines RLD, LDAD, and HADP. The factorial table below isolates HADP on RLD so the planner effect can be inspected without conflating it with LDAD.</p></div>
+        <div class="paper-results-grid"><article class="paper-result-card"><span class="mono-label">H = 25 · STANDARD CONTROL</span><div class="paper-result-row"><div><strong>94%</strong><span>Push-T</span></div><div><strong>92%</strong><span>Reacher</span></div></div><p><b>RLD + LDAD</b> vs LeWM at 88% and 86%.</p></article><article class="paper-result-card paper-result-card-accent"><span class="mono-label">LONG HORIZONS · FULL METHOD</span><div class="paper-result-row"><div><strong>19%</strong><span>H100</span></div><div><strong>16%</strong><span>H150</span></div></div><p><b>RLD + LDAD + HADP</b> vs LeWM at 16% and 8%.</p></article></div>
+        <div class="paper-note"><span>↳</span><p><strong>Why two tables?</strong> The 19% / 16% numbers are the paper’s rounded full-method comparison. The 18.7% / 16.7% values below are the isolated A1 residual × HADP factorial used to estimate the planner effect.</p></div>
+        <div class="evidence-topline"><div class="evidence-hero panel-dark"><div><span class="mono-label">A1 + HADP · ISOLATED FACTORIAL</span><strong>17.7%</strong><span class="evidence-sub">vs 13.7% native CEM · aggregate</span></div><div class="gain-badge"><strong>+4.0 pp</strong><span>point estimate</span></div></div><div class="ci-card panel"><span class="mono-label">HIERARCHICAL 95% CI</span><strong>[−2, +10] pp</strong><span>promising, not statistically established</span></div></div>
+        <div class="results-panel panel"><div class="results-header"><div><span class="mono-label">PAIRED PUSH-T CONTROL SUCCESS</span><h3 id="results-title">A1 residual + HADP vs A1 native</h3></div><div class="toggle-group result-tabs" role="tablist" aria-label="Result comparison"><button class="toggle-button is-active" data-result-tab="headline" type="button">HADP factorial</button><button class="toggle-button" data-result-tab="transfer" type="button">RLD/A14 transfer</button></div></div><div id="results-table" class="results-table-wrap"></div><div id="results-insight" class="results-insight"></div></div>
+        <div class="figure-context-row"><div class="figure-context-copy"><span class="mono-label">FIGURE-CHECKED MECHANISM</span><h3>HADP changes the ranking often enough to matter.</h3><p id="figure-context-copy">The mechanism figure shows a 45.1% decision-change rate at H100 and 36.8% at H150, with directional cost reductions of 1.9% and 1.3%.</p><div class="figure-stat-row"><span><b>40.9%</b><small>aggregate decisions changed</small></span><span><b>0.4816</b><small>direct rollout AUC</small></span><span><b>0.4956</b><small>RLD rollout AUC</small></span></div></div><div class="figure-thumbs" aria-label="Source figure exports"><a href="./assets/figures/hadp_mechanism.png" target="_blank" rel="noreferrer"><img src="./assets/figures/hadp_mechanism.png" alt="HADP mechanism figure export" /><span>mechanism figure ↗</span></a><a href="./assets/figures/sota_comparison.png" target="_blank" rel="noreferrer"><img src="./assets/figures/sota_comparison.png" alt="Paper benchmark figure export" /><span>benchmark figure ↗</span></a></div></div>
+      </section>
 
-        <div class="evidence-topline">
-          <div class="evidence-hero panel-dark">
-            <div><span class="mono-label">A1 + HADP · AGGREGATE</span><strong>17.7%</strong><span class="evidence-sub">vs 13.7% native CEM</span></div>
-            <div class="gain-badge"><strong>+4.0 pp</strong><span>point estimate</span></div>
-          </div>
-          <div class="ci-card panel"><span class="mono-label">HIERARCHICAL 95% CI</span><strong>[−2, +10] pp</strong><span>promising, not statistically established</span></div>
-        </div>
+      <section class="section-shell" id="dynamics">
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>03</span> RLD · learn the change</p><h2>Residual prediction helps early learning and trajectory structure.</h2></div><p class="section-intro">The paper’s first intervention is about the target seen by the predictor. Drag the epoch to see the strong early gap narrow by epoch 10.</p></div>
+        <div class="dynamics-toolbar panel"><div class="control-block"><span class="control-label">Transition target</span><div class="segmented" role="group" aria-label="Transition target"><button class="segment" data-dynamics-model="direct" type="button">Direct next latent</button><button class="segment is-active" data-dynamics-model="residual" type="button">Residual prediction</button></div></div><div class="epoch-control"><label class="control-label" for="epoch-slider">Training epoch <output id="epoch-value">1</output> / 10</label><input id="epoch-slider" type="range" min="1" max="10" value="1" step="1" /></div><div class="epoch-callout"><span>early gap</span><strong id="epoch-delta">−0.202 rollout AUC</strong></div></div>
+        <div class="dynamics-layout"><div class="panel latent-visual-panel"><div class="plot-toolbar"><span class="mono-label">SCHEMATIC LATENT PLANE</span><span class="plot-hint">exported metrics at right</span></div><canvas id="latent-canvas" width="820" height="480"></canvas><div class="latent-equation" id="latent-equation"><span>ẑ<sub>t+1</sub></span><b>=</b><span>z<sub>t</sub></span><b>+</b><span class="equation-accent">Δẑ<sub>t</sub></span></div><p class="plot-caption">RLD gives the predictor an identity path: predict the action-induced displacement, then add it to the current latent.</p></div><aside class="dynamics-aside"><div class="metric-grid"><div class="metric-card"><span>next-latent MSE</span><strong id="metric-next">0.0220</strong><small>one-step diagnostic · lower</small></div><div class="metric-card metric-card-coral"><span>rollout MSE AUC</span><strong id="metric-rollout">0.7873</strong><small>horizons 1–32 · lower</small></div><div class="metric-card metric-card-teal"><span>path straightness</span><strong id="metric-straightness">0.368</strong><small>latent geometry · higher</small></div></div><div class="panel mini-chart-panel"><div class="mini-chart-head"><span class="mono-label">ROLLOUT AUC ACROSS EPOCHS</span><span class="chart-key"><i class="key-direct"></i> direct <i class="key-residual"></i> residual</span></div><canvas id="dynamics-chart" width="650" height="270"></canvas></div><div class="dynamics-readout" id="dynamics-readout">At epoch 1, residual prediction lowers rollout AUC by 0.202 and raises encoded straightness by 0.101 on this one-seed trace.</div></aside></div>
+      </section>
 
-        <div class="results-panel panel">
-          <div class="results-header">
-            <div>
-              <span class="mono-label">PAIRED PUSH-T CONTROL SUCCESS</span>
-              <h3 id="results-title">A1 residual + HADP vs A1 native</h3>
-            </div>
-            <div class="toggle-group result-tabs" role="tablist" aria-label="Result comparison">
-              <button class="toggle-button is-active" data-result-tab="headline" type="button">Headline</button>
-              <button class="toggle-button" data-result-tab="transfer" type="button">RLD/A14 transfer</button>
-            </div>
-          </div>
-          <div id="results-table" class="results-table-wrap"></div>
-          <div id="results-insight" class="results-insight"></div>
-        </div>
+      <section class="section-shell section-tint" id="ldad">
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>04</span> LDAD · retain action information</p><h2>Make the latent displacement explain the action.</h2></div><p class="section-intro">LDAD adds an inverse-dynamics-style training signal to the RLD displacement. It is not an extra inference module: the decoder is discarded before CEM planning.</p></div>
+        <div class="ldad-layout"><div class="panel ldad-visual-panel"><div class="plot-toolbar"><span class="mono-label">TRAINING-ONLY ACTION SIGNAL</span><span class="plot-hint">d<sub>t</sub> = z<sub>t+1</sub> − z<sub>t</sub></span></div><canvas id="ldad-canvas" width="820" height="430"></canvas><div class="latent-equation"><span>d<sub>t</sub></span><b>→</b><span class="equation-accent">D<sub>ψ</sub>(d<sub>t</sub>)</span><b>→</b><span>â<sub>t</sub></span></div><p class="plot-caption">The decoder sees the change, not the absolute latent. At test time, the decoder leaves the graph and CEM uses the learned model as usual.</p></div><aside class="panel ldad-aside"><div class="plot-toolbar"><span class="mono-label">MATCHED EPOCH-8 CHECKPOINT</span><div class="toggle-group" role="group" aria-label="LDAD comparison"><button class="toggle-button is-active" data-ldad-model="ldad" type="button">RLD + LDAD</button><button class="toggle-button" data-ldad-model="rld" type="button">RLD</button></div></div><div class="ldad-score-list"><div><span>H5 action-ranking accuracy</span><strong id="ldad-ranking">93%</strong></div><div><span>expert-vs-shuffled margin</span><strong id="ldad-margin">0.1674</strong></div><div><span>H5 action sensitivity</span><strong id="ldad-sensitivity">0.8082</strong></div><div><span>Push-T control success</span><strong id="ldad-control">94%</strong></div><div><span>rollout MSE AUC</span><strong id="ldad-rollout">0.5302</strong></div></div><div class="ldad-claim"><span>paper claim</span><p>LDAD improves action awareness while preserving downstream rollout quality.</p></div></aside></div>
+      </section>
 
-        <div class="figure-context-row">
-          <div class="figure-context-copy">
-            <span class="mono-label">FIGURE-CHECKED CONTEXT</span>
-            <h3>HADP changes the decision often enough to matter.</h3>
-            <p id="figure-context-copy">The locked mechanism figure shows a 45.1% decision-change rate at H100 and 36.8% at H150, with directional cost reductions of 1.9% and 1.3%.</p>
-            <div class="figure-stat-row">
-              <span><b>40.9%</b><small>aggregate decisions changed</small></span>
-              <span><b>0.4816</b><small>direct rollout AUC</small></span>
-              <span><b>0.4956</b><small>RLD rollout AUC</small></span>
-            </div>
-          </div>
-          <div class="figure-thumbs" aria-label="Source figure exports">
-            <a href="./assets/figures/hadp_mechanism.png" target="_blank" rel="noreferrer"><img src="./assets/figures/hadp_mechanism.png" alt="HADP mechanism figure export" /><span>mechanism figure ↗</span></a>
-            <a href="./assets/figures/residual_latent_dynamics.png" target="_blank" rel="noreferrer"><img src="./assets/figures/residual_latent_dynamics.png" alt="Residual latent dynamics figure export" /><span>dynamics figure ↗</span></a>
-          </div>
-        </div>
+      <section class="section-shell" id="microscope">
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>05</span> HADP · rank the plan</p><h2>Open one CEM decision and see what changes.</h2></div><p class="section-intro">Every dot is a candidate terminal latent from the same learned model. Native CEM sees final distance; HADP also sees whether the movement points toward the goal.</p></div>
+        <div class="microscope-layout"><div class="panel microscope-plot-panel"><div class="plot-toolbar"><span class="mono-label">CEM ITERATION 03 / 08</span><div class="toggle-group" role="group" aria-label="Planner used for candidate ranking"><button class="toggle-button" data-planner-mode="native" type="button">Native CEM</button><button class="toggle-button is-active" data-planner-mode="hadp" type="button">HADP</button></div></div><canvas id="microscope-canvas" width="820" height="500"></canvas><div class="plot-legend"><span><i class="legend-line legend-line-goal"></i> desired goal direction</span><span><i class="legend-dot legend-dot-candidate"></i> candidate terminal latent</span><span><i class="legend-dot legend-dot-selected"></i> selected candidate</span></div></div><aside class="panel microscope-aside"><div class="aside-heading"><span class="mono-label">RANKING RULE</span><span class="lock-badge">LOCKED BY HORIZON</span></div><div class="weight-row"><span>directional weight <b>λ</b></span><output id="weight-value">2.0</output></div><div class="range-wrap"><input id="weight-slider" type="range" min="0" max="3" value="2" step="0.1" aria-label="Directional cost weight" /><div class="range-markers" aria-hidden="true"><span style="left: 33.33%">H150 · 1</span><span style="left: 66.66%">H100 · 2</span></div></div><div class="locked-horizons"><button class="locked-horizon" data-horizon="150" type="button"><span>H150</span><strong>λ = 1</strong></button><button class="locked-horizon is-active" data-horizon="100" type="button"><span>H100</span><strong>λ = 2</strong></button></div><button class="button button-dark-wide" id="microscope-replay" type="button">Replay candidate ranking <span aria-hidden="true">↗</span></button><div class="selected-candidate"><span class="micro-label">SELECTED CANDIDATE</span><div class="selected-line"><strong id="selected-candidate">C06</strong><span id="selected-candidate-note">HADP promotes directional alignment</span></div></div><div class="score-stack"><div class="score-row"><div><span>terminal goal distance</span><small>lower is better</small></div><strong id="terminal-score">0.19</strong></div><div class="score-bar"><i id="terminal-score-bar" style="width: 38%"></i></div><div class="score-row"><div><span>directional cost</span><small>alignment penalty</small></div><strong id="direction-score">0.08</strong></div><div class="score-bar score-bar-coral"><i id="direction-score-bar" style="width: 22%"></i></div><div class="score-total"><span>combined score</span><strong id="combined-score">0.35</strong></div></div><p class="aside-footnote">HADP changes candidate ranking, not the learned model.</p></aside></div>
       </section>
 
       <section class="section-shell gallery-section" id="gallery">
-        <div class="section-head section-head-wide">
-          <div>
-            <p class="section-kicker"><span>05</span> Case-level evidence gallery</p>
-            <h2>Keep the failures in the frame.</h2>
-          </div>
-          <p class="section-intro">
-            Filter the paired episodes by outcome. Each card keeps the planner scores visible and states the
-            observed decision in plain language.
-          </p>
-        </div>
-        <div class="gallery-toolbar">
-          <div class="filter-group" role="group" aria-label="Filter episode gallery">
-            <button class="filter-button is-active" data-gallery-filter="all" type="button">All <span>8</span></button>
-            <button class="filter-button" data-gallery-filter="rescue" type="button">Rescued by HADP <span>2</span></button>
-            <button class="filter-button" data-gallery-filter="loss" type="button">Lost by HADP <span>2</span></button>
-            <button class="filter-button" data-gallery-filter="both-succeed" type="button">Both succeed <span>2</span></button>
-            <button class="filter-button" data-gallery-filter="both-fail" type="button">Both fail <span>2</span></button>
-          </div>
-          <span class="gallery-note"><i></i> recorded reference clips where available</span>
-        </div>
-        <div id="gallery-grid" class="gallery-grid"></div>
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>06</span> Case-level evidence</p><h2>Keep the failures in the frame.</h2></div><p class="section-intro">The gallery is the bridge between one inspected decision and the aggregate table. Filter the representative cases by outcome.</p></div><div class="gallery-toolbar"><div class="filter-group" role="group" aria-label="Filter episode gallery"><button class="filter-button is-active" data-gallery-filter="all" type="button">All <span>8</span></button><button class="filter-button" data-gallery-filter="rescue" type="button">Rescued by HADP <span>2</span></button><button class="filter-button" data-gallery-filter="loss" type="button">Lost by HADP <span>2</span></button><button class="filter-button" data-gallery-filter="both-succeed" type="button">Both succeed <span>2</span></button><button class="filter-button" data-gallery-filter="both-fail" type="button">Both fail <span>2</span></button></div><span class="gallery-note"><i></i> recorded A5 reference clips</span></div><div id="gallery-grid" class="gallery-grid"></div>
       </section>
 
       <section class="section-shell boundaries-section" id="boundaries">
-        <div class="section-head section-head-wide">
-          <div>
-            <p class="section-kicker"><span>06</span> Findings &amp; boundaries</p>
-            <h2>A map of what the evidence does—and does not—say.</h2>
-          </div>
-          <p class="section-intro">The page is designed to make the caveats legible at the same zoom level as the wins.</p>
-        </div>
-        <div class="evidence-map">
-          <article class="finding-card finding-positive"><span class="finding-index">01</span><span class="finding-state">supported by this study</span><h3>Residual prediction improves optimization and early control.</h3><p>At epoch 1, A1 has lower rollout AUC and higher straightness than A0 on the recorded one-seed trajectory.</p></article>
-          <article class="finding-card finding-positive"><span class="finding-index">02</span><span class="finding-state">positive point estimates</span><h3>HADP is positive at both tested horizons.</h3><p>A1 + HADP reaches 18.7% at H100 and 16.7% at H150, compared with 13.3% and 14.0% for native CEM.</p></article>
-          <article class="finding-card finding-neutral"><span class="finding-index">03</span><span class="finding-state">factorial evidence</span><h3>The contributions operate independently.</h3><p>A19 reports no residual × directional-planning interaction: +0.0 pp, 95% CI [−7.3, +7.0].</p></article>
-          <article class="finding-card finding-boundary"><span class="finding-index">04</span><span class="finding-state">not validated</span><h3>Continuous horizon interpolation was not tested.</h3><p>The locked weights are λ=2 for H100 and λ=1 for H150. Do not generalize between them without new evaluation.</p></article>
-          <article class="finding-card finding-boundary"><span class="finding-index">05</span><span class="finding-state">not consistent</span><h3>RLD/A14 and HADP did not consistently stack.</h3><p>The transfer result moves from 15.3% → 19.3% at H100 but 13.3% → 12.7% at H150.</p></article>
-          <article class="finding-card finding-boundary"><span class="finding-index">06</span><span class="finding-state">scope of evidence</span><h3>Current evidence uses one training seed.</h3><p>Episode bootstrap intervals do not replace multi-seed uncertainty. Treat the result as a promising lead.</p></article>
-        </div>
-
-        <div class="resource-row panel">
-          <div><span class="mono-label">TAKE THE EVIDENCE WITH YOU</span><h3>Paper, protocol, and raw exports.</h3></div>
-          <div class="resource-links">
-            <a href="https://arxiv.org/abs/2603.19312" target="_blank" rel="noreferrer">Paper <span>↗</span></a>
-            <a href="https://github.com/lc82111/video-jepa-demo" target="_blank" rel="noreferrer">Repository <span>↗</span></a>
-            <a href="./protocol.html">Evaluation protocol <span>↗</span></a>
-            <a href="./assets/figures/sota_comparison.png" target="_blank" rel="noreferrer">Benchmark figure <span>↗</span></a>
-            <a href="./assets/figures/ldad_action_awareness.png" target="_blank" rel="noreferrer">Action figure <span>↗</span></a>
-            <a href="./data/results.json" download>Results JSON <span>↓</span></a>
-            <a href="./data/training-dynamics.csv" download>Dynamics CSV <span>↓</span></a>
-          </div>
-        </div>
+        <div class="section-head section-head-wide"><div><p class="section-kicker"><span>07</span> Findings &amp; boundaries</p><h2>What the paper supports—and what it does not.</h2></div><p class="section-intro">The final section is deliberately plain: the components are complementary in the design, but not every combination is a clean win.</p></div>
+        <div class="evidence-map"><article class="finding-card finding-positive"><span class="finding-index">01</span><span class="finding-state">RLD</span><h3>Improves early transition learning.</h3><p>RLD reaches 34% vs 16% Push-T success at epoch 1 and improves temporal path straightness.</p></article><article class="finding-card finding-positive"><span class="finding-index">02</span><span class="finding-state">LDAD</span><h3>Makes displacement action-aware.</h3><p>H5 action-ranking accuracy rises from 84% to 93%; the decoder is training-only.</p></article><article class="finding-card finding-positive"><span class="finding-index">03</span><span class="finding-state">HADP</span><h3>Changes 40.9% of CEM decisions.</h3><p>Directional cost falls while the learned model stays fixed; point estimates are positive at both tested horizons.</p></article><article class="finding-card finding-boundary"><span class="finding-index">04</span><span class="finding-state">uncertainty</span><h3>The long-horizon interval crosses zero.</h3><p>The isolated A1 + HADP aggregate CI is [−2, +10] pp: promising, not statistically established.</p></article><article class="finding-card finding-boundary"><span class="finding-index">05</span><span class="finding-state">not validated</span><h3>Continuous horizon interpolation was not tested.</h3><p>The locked weights are λ=2 at H100 and λ=1 at H150; do not interpolate without new evaluation.</p></article><article class="finding-card finding-boundary"><span class="finding-index">06</span><span class="finding-state">scope</span><h3>Current evidence uses one training seed.</h3><p>Episode bootstrap intervals do not replace uncertainty over training seeds.</p></article></div>
+        <div class="resource-row panel"><div><span class="mono-label">TAKE THE EVIDENCE WITH YOU</span><h3>Paper, protocol, figures, and raw exports.</h3></div><div class="resource-links"><a href="https://arxiv.org/abs/2603.19312" target="_blank" rel="noreferrer">Paper <span>↗</span></a><a href="https://github.com/lc82111/video-jepa-demo" target="_blank" rel="noreferrer">Repository <span>↗</span></a><a href="./protocol.html">Evaluation protocol <span>↗</span></a><a href="./assets/figures/ldad_action_awareness.png" target="_blank" rel="noreferrer">LDAD figure <span>↗</span></a><a href="./data/results.json" download>Results JSON <span>↓</span></a><a href="./data/training-dynamics.csv" download>Dynamics CSV <span>↓</span></a></div></div>
       </section>
     </main>
-
-    <footer class="site-footer section-shell">
-      <span>latent / path · Push-T interactive evidence</span>
-      <span>browser-only · no GPU required</span>
-      <a href="#top">back to top ↑</a>
-    </footer>
-
-    <script src="./data.js"></script>
-    <script src="./app.js"></script>
+    <footer class="site-footer section-shell"><span>latent / path · interactive paper companion</span><span>browser-only · no GPU required</span><a href="#top">back to top ↑</a></footer>
+    <script src="./data.js"></script><script src="./app.js"></script>
   </body>
 </html>

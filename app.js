@@ -59,6 +59,12 @@
     metricStraightness: document.getElementById("metric-straightness"),
     dynamicsChart: document.getElementById("dynamics-chart"),
     dynamicsReadout: document.getElementById("dynamics-readout"),
+    ldadCanvas: document.getElementById("ldad-canvas"),
+    ldadRanking: document.getElementById("ldad-ranking"),
+    ldadMargin: document.getElementById("ldad-margin"),
+    ldadSensitivity: document.getElementById("ldad-sensitivity"),
+    ldadControl: document.getElementById("ldad-control"),
+    ldadRollout: document.getElementById("ldad-rollout"),
     resultsTitle: document.getElementById("results-title"),
     resultsTable: document.getElementById("results-table"),
     resultsInsight: document.getElementById("results-insight"),
@@ -77,6 +83,7 @@
     microscopeCursor: 0,
     microscopeClock: 0,
     dynamicsModel: "residual",
+    ldadModel: "ldad",
     epoch: 1,
     resultsTab: "headline",
     galleryFilter: "all",
@@ -584,7 +591,7 @@
     dom.metricRollout.textContent = format(model.rollout, 4);
     dom.metricStraightness.textContent = format(model.straightness, 3);
     dom.epochDelta.textContent = `${signed(rolloutDelta, 3)} rollout AUC`;
-    dom.dynamicsReadout.textContent = `At epoch ${state.epoch}, residual prediction changes rollout AUC by ${signed(rolloutDelta, 3)} and encoded straightness by ${signed(straightnessDelta, 3)} relative to direct prediction on this one-seed trace.`;
+    dom.dynamicsReadout.textContent = `At epoch ${state.epoch}, residual prediction changes rollout AUC by ${signed(rolloutDelta, 3)} and encoded straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across epochs 1–10, validation-prediction AUC is 0.00753 for RLD vs 0.00979 for direct prediction.`;
     if (state.dynamicsModel === "residual") {
       dom.latentEquation.innerHTML = "<span>ẑ<sub>t+1</sub></span><b>=</b><span>z<sub>t</sub></span><b>+</b><span class=\"equation-accent\">Δẑ<sub>t</sub></span>";
     } else {
@@ -774,6 +781,99 @@
     context.textAlign = "left";
   }
 
+  function renderLdad() {
+    const metrics = DATA.figureMetrics.rldActionAwareness;
+    const ldad = state.ldadModel === "ldad";
+    dom.ldadRanking.textContent = ldad ? metrics.rankingAccuracy.ldad : metrics.rankingAccuracy.rld;
+    dom.ldadMargin.textContent = ldad ? metrics.margin.ldad : metrics.margin.rld;
+    dom.ldadSensitivity.textContent = ldad ? metrics.sensitivity.ldad : metrics.sensitivity.rld;
+    dom.ldadControl.textContent = ldad ? metrics.control.ldad : metrics.control.rld;
+    dom.ldadRollout.textContent = ldad ? metrics.rolloutAuc.ldad : metrics.rolloutAuc.rld;
+    document.querySelectorAll("[data-ldad-model]").forEach((button) => button.classList.toggle("is-active", button.dataset.ldadModel === state.ldadModel));
+    const canvas = getCanvas(dom.ldadCanvas);
+    drawLdad(canvas.context, canvas.width, canvas.height, ldad);
+  }
+
+  function drawLdad(context, width, height, ldadEnabled) {
+    context.fillStyle = COLORS.white;
+    context.fillRect(0, 0, width, height);
+    const fontFamily = getComputedStyle(document.body).fontFamily;
+    const latentA = { x: width * 0.16, y: height * 0.48 };
+    const latentB = { x: width * 0.38, y: height * 0.48 };
+    const decoder = { x: width * 0.58, y: height * 0.48 };
+    const action = { x: width * 0.84, y: height * 0.48 };
+    const circle = (point, label, sublabel, fill, stroke) => {
+      context.fillStyle = fill;
+      context.strokeStyle = stroke;
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(point.x, point.y, Math.min(42, width * 0.055), 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+      context.fillStyle = COLORS.ink;
+      context.font = `700 ${Math.max(11, width / 60)}px ${fontFamily}`;
+      context.textAlign = "center";
+      context.fillText(label, point.x, point.y + 4);
+      context.fillStyle = COLORS.inkSoft;
+      context.font = `600 ${Math.max(9, width / 90)}px ${fontFamily}`;
+      context.fillText(sublabel, point.x, point.y + 63);
+      context.textAlign = "left";
+    };
+    circle(latentA, "zₜ", "current latent", "rgba(103, 214, 201, 0.24)", COLORS.cyanDeep);
+    circle(latentB, "zₜ₊₁", "next latent", "rgba(240, 206, 112, 0.25)", "#b38a22");
+    drawArrow(context, latentA.x + 44, latentA.y, latentB.x - 44, latentB.y, COLORS.coral, 3);
+    context.fillStyle = COLORS.coralDeep;
+    context.font = `800 ${Math.max(10, width / 72)}px ${fontFamily}`;
+    context.textAlign = "center";
+    context.fillText("dₜ = zₜ₊₁ − zₜ", (latentA.x + latentB.x) / 2, latentA.y - 26);
+    context.textAlign = "left";
+
+    context.fillStyle = "rgba(242, 106, 83, 0.10)";
+    context.strokeStyle = "rgba(183, 71, 60, 0.40)";
+    context.lineWidth = 1.5;
+    roundedRect(context, decoder.x - 68, decoder.y - 38, 136, 76, 12);
+    context.fill();
+    context.stroke();
+    context.fillStyle = COLORS.coralDeep;
+    context.font = `800 ${Math.max(11, width / 65)}px ${fontFamily}`;
+    context.textAlign = "center";
+    context.fillText("action decoder", decoder.x, decoder.y - 3);
+    context.fillStyle = COLORS.inkSoft;
+    context.font = `600 ${Math.max(9, width / 90)}px ${fontFamily}`;
+    context.fillText("Dψ(dₜ) → âₜ", decoder.x, decoder.y + 20);
+    context.textAlign = "left";
+    drawArrow(context, latentB.x + 45, latentB.y, decoder.x - 72, decoder.y, COLORS.coral, 2.3);
+    drawArrow(context, decoder.x + 72, decoder.y, action.x - 40, action.y, ldadEnabled ? COLORS.cyanDeep : "rgba(82, 98, 114, 0.35)", 2.3);
+
+    context.fillStyle = ldadEnabled ? COLORS.cyanDeep : COLORS.inkSoft;
+    context.beginPath();
+    context.arc(action.x, action.y, 7, 0, Math.PI * 2);
+    context.fill();
+    const actionArrows = [
+      { dx: 46, dy: -31 },
+      { dx: 55, dy: 2 },
+      { dx: 40, dy: 34 }
+    ];
+    actionArrows.forEach((arrow, index) => {
+      const color = ldadEnabled ? [COLORS.cyanDeep, COLORS.coral, "#97741b"][index] : "rgba(82, 98, 114, 0.32)";
+      drawArrow(context, action.x, action.y, action.x + arrow.dx, action.y + arrow.dy, color, 2);
+    });
+    context.fillStyle = ldadEnabled ? COLORS.cyanDeep : COLORS.inkSoft;
+    context.font = `700 ${Math.max(10, width / 74)}px ${fontFamily}`;
+    context.textAlign = "center";
+    context.fillText(ldadEnabled ? "action-separated changes" : "less separated changes", action.x, action.y + 67);
+    context.textAlign = "left";
+
+    context.fillStyle = ldadEnabled ? "rgba(28, 147, 140, 0.12)" : "rgba(82, 98, 114, 0.10)";
+    roundedRect(context, width * 0.29, height - 57, width * 0.42, 28, 14);
+    context.fill();
+    context.fillStyle = ldadEnabled ? COLORS.cyanDeep : COLORS.inkSoft;
+    context.font = `800 ${Math.max(9, width / 86)}px ${fontFamily}`;
+    context.textAlign = "center";
+    context.fillText("training only · decoder discarded before CEM", width * 0.50, height - 39);
+    context.textAlign = "left";
+  }
+
   function renderResults() {
     const result = DATA.quantitative[state.resultsTab];
     dom.resultsTitle.textContent = result.title;
@@ -857,6 +957,10 @@
       state.dynamicsModel = button.dataset.dynamicsModel;
       renderDynamics();
     }));
+    document.querySelectorAll("[data-ldad-model]").forEach((button) => button.addEventListener("click", () => {
+      state.ldadModel = button.dataset.ldadModel;
+      renderLdad();
+    }));
     document.querySelectorAll("[data-result-tab]").forEach((button) => button.addEventListener("click", () => {
       state.resultsTab = button.dataset.resultTab;
       renderResults();
@@ -907,6 +1011,7 @@
       renderRollout();
       renderMicroscope();
       renderDynamics();
+      renderLdad();
       renderGallery();
     });
     document.addEventListener("keydown", (event) => {
@@ -923,6 +1028,7 @@
   renderRollout();
   renderMicroscope();
   renderDynamics();
+  renderLdad();
   renderResults();
   renderFigureContext();
   renderGallery();
