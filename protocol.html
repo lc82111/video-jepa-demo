@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluation protocol · latent / path</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-nav">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>latent / path</span></a>
+      <a class="nav-cta" href="./index.html">Back to the demo <span aria-hidden="true">↗</span></a>
+    </header>
+    <main class="section-shell" style="padding-top: 86px; padding-bottom: 100px;">
+      <p class="section-kicker"><span>↗</span> Evaluation protocol</p>
+      <h1 style="max-width: 760px; margin: 22px 0 18px; font-size: clamp(42px, 6vw, 72px); font-weight: 500; letter-spacing: -0.06em; line-height: 1;">What was held fixed, what was changed, and what was measured.</h1>
+      <p style="max-width: 680px; color: var(--ink-soft); font-size: 17px; line-height: 1.7;">This page records the protocol behind the interactive companion. It is intentionally compact; the repository contains the full run manifests and logs.</p>
+
+      <div class="evidence-map" style="margin-top: 50px;">
+        <article class="finding-card finding-positive"><span class="finding-index">01</span><span class="finding-state">control evaluation</span><h3>100 paired Push-T cases</h3><p>Initial states, goals, case ordering, and selection seed 42 were held fixed across planner comparisons.</p></article>
+        <article class="finding-card finding-positive"><span class="finding-index">02</span><span class="finding-state">tested horizons</span><h3>H100 and H150</h3><p>HADP uses the locked directional weights λ=2 at H100 and λ=1 at H150. Continuous interpolation was not validated.</p></article>
+        <article class="finding-card finding-neutral"><span class="finding-index">03</span><span class="finding-state">model comparison</span><h3>Same learned dynamics</h3><p>Native CEM and HADP rank the same candidate terminal latents. HADP adds a directional cost to the planning score.</p></article>
+        <article class="finding-card finding-neutral"><span class="finding-index">04</span><span class="finding-state">dynamics evaluation</span><h3>Epochs 1 through 10</h3><p>Direct next-latent and residual prediction are compared with next-latent MSE, autoregressive rollout AUC, and temporal path straightness.</p></article>
+        <article class="finding-card finding-boundary"><span class="finding-index">05</span><span class="finding-state">uncertainty</span><h3>Episode bootstrap intervals</h3><p>Reported intervals capture paired case variation. They do not replace uncertainty over training seeds; the current evidence uses one training seed.</p></article>
+        <article class="finding-card finding-boundary"><span class="finding-index">06</span><span class="finding-state">reference clips</span><h3>MP4s are labeled honestly</h3><p>The synchronized comparison is browser-rendered from representative traces. The available MP4s are recorded reference clips from the A5 run, not paired Native/HADP replays.</p></article>
+      </div>
+
+      <div class="resource-row panel" style="margin-top: 28px;">
+        <div><span class="mono-label">DOWNLOADS</span><h3>Raw browser-ready exports.</h3></div>
+        <div class="resource-links"><a href="./data/results.json" download>Results JSON <span>↓</span></a><a href="./data/training-dynamics.csv" download>Dynamics CSV <span>↓</span></a><a href="./index.html">Back to demo <span>↗</span></a></div>
+      </div>
+    </main>
+  </body>
+</html>
