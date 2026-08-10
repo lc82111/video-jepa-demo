@@ -8,7 +8,7 @@ window.PAPER_DATA = {
       label: "Rescue",
       seed: 42,
       title: "Rescue at decision step 3",
-      caption: "At decision 3, HADP picked a move that pointed more directly toward the goal.",
+      caption: "At decision 3, HAP picked a move that pointed more directly toward the goal.",
       initial: { x: 0.16, y: 0.73 },
       goal: { x: 0.81, y: 0.28 },
       phase: 0.2,
@@ -30,7 +30,7 @@ window.PAPER_DATA = {
       label: "Rescue",
       seed: 42,
       title: "Rescue through the narrow side",
-      caption: "At decision 5, HADP kept moving toward the goal instead of circling it.",
+      caption: "At decision 5, HAP kept moving toward the goal instead of circling it.",
       initial: { x: 0.22, y: 0.25 },
       goal: { x: 0.79, y: 0.73 },
       phase: 1.4,
@@ -52,7 +52,7 @@ window.PAPER_DATA = {
       label: "Loss",
       seed: 42,
       title: "A directional over-correction",
-      caption: "Native CEM succeeds here; HADP chooses a worse direction and misses.",
+      caption: "Native CEM succeeds here; HAP chooses a worse direction and misses.",
       initial: { x: 0.16, y: 0.56 },
       goal: { x: 0.78, y: 0.22 },
       phase: 2.4,
@@ -74,7 +74,7 @@ window.PAPER_DATA = {
       label: "Loss",
       seed: 42,
       title: "Close, but pointed away",
-      caption: "HADP changes the choice at decision 2, but this route misses the final contact.",
+      caption: "HAP changes the choice at decision 2, but this route misses the final contact.",
       initial: { x: 0.26, y: 0.78 },
       goal: { x: 0.76, y: 0.34 },
       phase: 3.1,
@@ -96,7 +96,7 @@ window.PAPER_DATA = {
       label: "Both succeed",
       seed: 42,
       title: "Two valid routes",
-      caption: "Both plans reach the goal; HADP chooses the one with better direction.",
+      caption: "Both plans reach the goal; HAP chooses the one with better direction.",
       initial: { x: 0.19, y: 0.68 },
       goal: { x: 0.83, y: 0.37 },
       phase: 0.8,
@@ -235,22 +235,22 @@ window.PAPER_DATA = {
 
   quantitative: {
     headline: {
-      title: "RLD + HADP compared with RLD only",
+      title: "RLT + HAP compared with RLT only",
       columns: ["H=100", "H=150", "Aggregate"],
       rows: [
-        { label: "RLD only", values: ["13.3%", "14.0%", "13.7%"], kind: "base" },
-        { label: "RLD + HADP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
+        { label: "RLT only", values: ["13.3%", "14.0%", "13.7%"], kind: "base" },
+        { label: "RLT + HADP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
         { label: "Gain", values: ["+5.3 pp", "+2.7 pp", "+4.0 pp"], kind: "gain" }
       ],
       insight: "The aggregate 95% CI is [−2, +10] pp. The point estimate is encouraging, but the interval crosses zero.",
       foot: "3 evaluation seeds × 50 paired cases per horizon · locked λ=2 at H=100 and λ=1 at H=150"
     },
     transfer: {
-      title: "RLD + LDAD with and without HADP",
+      title: "RLT + ADR with and without HADP",
       columns: ["H=100", "H=150", "Aggregate"],
       rows: [
-        { label: "RLD + LDAD", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
-        { label: "RLD + LDAD + HADP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
+        { label: "RLD + ADR", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
+        { label: "RLD + ADR + HAP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
         { label: "Planner change", values: ["+4.0 pp", "−0.7 pp", "+1.7 pp"], kind: "gain" }
       ],
       insight: "The transfer is horizon-dependent: positive at H=100, negative at H=150. It is evidence of a planning effect, not a consistent stack.",
