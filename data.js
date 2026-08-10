@@ -239,14 +239,14 @@ window.PAPER_DATA = {
       columns: ["H=100", "H=150", "Aggregate"],
       rows: [
         { label: "RLT only", values: ["13.3%", "14.0%", "13.7%"], kind: "base" },
-        { label: "RLT + HADP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
+        { label: "RLT + HAP", values: ["18.7%", "16.7%", "17.7%"], kind: "highlight" },
         { label: "Gain", values: ["+5.3 pp", "+2.7 pp", "+4.0 pp"], kind: "gain" }
       ],
       insight: "The aggregate 95% CI is [−2, +10] pp. The point estimate is encouraging, but the interval crosses zero.",
       foot: "3 evaluation seeds × 50 paired cases per horizon · locked λ=2 at H=100 and λ=1 at H=150"
     },
     transfer: {
-      title: "RLT + ADR with and without HADP",
+      title: "RLT + ADR with and without HAP",
       columns: ["H=100", "H=150", "Aggregate"],
       rows: [
         { label: "RLD + ADR", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
