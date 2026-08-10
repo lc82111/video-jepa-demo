@@ -9,12 +9,12 @@
     "note": "Episode bootstrap intervals do not replace multi-seed uncertainty."
   },
   "headline": {
-    "experiment": "RLD + HADP planning comparison",
+    "experiment": "RLT + HAP planning comparison",
     "table": {
       "columns": ["H100", "H150", "Aggregate"],
       "rows": [
-        { "label": "RLD only", "values": [13.3, 14.0, 13.7], "unit": "%" },
-        { "label": "RLD + HADP", "values": [18.7, 16.7, 17.7], "unit": "%" },
+        { "label": "RLT only", "values": [13.3, 14.0, 13.7], "unit": "%" },
+        { "label": "RLT + HAP", "values": [18.7, 16.7, 17.7], "unit": "%" },
         { "label": "Gain", "values": [5.3, 2.7, 4.0], "unit": "percentage points" }
       ]
     },
@@ -23,7 +23,7 @@
     "locked_directional_weight": { "H100": 2, "H150": 1 }
   },
   "transfer": {
-    "experiment": "RLD + LDAD with and without HADP",
+    "experiment": "RLT + ADR with and without HAP",
     "native_percent": { "H100": 15.3, "H150": 13.3, "Aggregate": 14.3 },
     "hadp_percent": { "H100": 19.3, "H150": 12.7, "Aggregate": 16.0 },
     "interpretation": "Horizon-dependent transfer result, not a consistent stack."
@@ -31,26 +31,26 @@
   "figure_checked_context": {
     "hadp_directional_cost_reduction": { "H100": "-0.0075 (1.9%)", "H150": "-0.0057 (1.3%)" },
     "changed_cem_decisions": { "H100": 45.1, "H150": 36.8, "Aggregate": 40.9 },
-    "standard_control_push_t_percent": { "Random": 2, "LeWM": 88, "PLDM": 78, "DINO-WM": 74, "RLD + LDAD": 94 },
-    "standard_control_reacher_percent": { "Random": 10, "LeWM": 86, "PLDM": 78, "DINO-WM": 79, "RLD + LDAD": 92 },
+    "standard_control_push_t_percent": { "Random": 2, "LeWM": 88, "PLDM": 78, "DINO-WM": 74, "RLT + ADR": 94 },
+    "standard_control_reacher_percent": { "Random": 10, "LeWM": 86, "PLDM": 78, "DINO-WM": 79, "RLT + ADR": 92 },
     "long_horizon_percent": {
       "LeWM": { "H100": 16, "H150": 8 },
-      "LeWM + HADP": { "H100": 18, "H150": 13 },
-      "RLD": { "H100": 15, "H150": 13 },
-      "RLD + HADP": { "H100": 18, "H150": 12 },
-      "RLD + LDAD + HADP": { "H100": 19, "H150": 16 }
+      "LeWM + HAP": { "H100": 18, "H150": 13 },
+      "RLT": { "H100": 15, "H150": 13 },
+      "RLT + HAP": { "H100": 18, "H150": 12 },
+      "RLT + ADR + HAP": { "H100": 19, "H150": 16 }
     },
     "rld_action_awareness": {
-      "H5_action_ranking_accuracy": { "RLD": 84, "RLD + LDAD": 93 },
-      "expert_vs_shuffled_margin": { "RLD": 0.1105, "RLD + LDAD": 0.1674 },
-      "H5_action_sensitivity": { "RLD": 0.7831, "RLD + LDAD": 0.8082 },
-      "control_success": { "RLD": 92, "RLD + LDAD": 94 },
-      "rollout_mse_auc": { "RLD": 0.5364, "RLD + LDAD": 0.5302 }
+      "H5_action_ranking_accuracy": { "RLT": 84, "RLT + ADR": 93 },
+      "expert_vs_shuffled_margin": { "RLT": 0.1105, "RLT + ADR": 0.1674 },
+      "H5_action_sensitivity": { "RLT": 0.7831, "RLT + ADR": 0.8082 },
+      "control_success": { "RLT": 92, "RLT + ADR": 94 },
+      "rollout_mse_auc": { "RLT": 0.5364, "RLT + ADR": 0.5302 }
     }
   },
   "boundaries": [
     "Continuous horizon interpolation was not validated.",
-    "LDAD and HADP did not consistently stack.",
+    "ADR and HAP did not consistently stack.",
     "Current evidence uses one training seed.",
     "The interaction test found no reliable interaction between residual dynamics and directional planning."
   ]

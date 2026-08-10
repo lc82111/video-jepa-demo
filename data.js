@@ -249,8 +249,8 @@ window.PAPER_DATA = {
       title: "RLT + ADR with and without HAP",
       columns: ["H=100", "H=150", "Aggregate"],
       rows: [
-        { label: "RLD + ADR", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
-        { label: "RLD + ADR + HAP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
+        { label: "RLT + ADR", values: ["15.3%", "13.3%", "14.3%"], kind: "base" },
+        { label: "RLT + ADR + HAP", values: ["19.3%", "12.7%", "16.0%"], kind: "highlight" },
         { label: "Planner change", values: ["+4.0 pp", "−0.7 pp", "+1.7 pp"], kind: "gain" }
       ],
       insight: "The transfer is horizon-dependent: positive at H=100, negative at H=150. It is evidence of a planning effect, not a consistent stack.",

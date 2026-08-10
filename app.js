@@ -591,7 +591,7 @@
     dom.metricRollout.textContent = format(model.rollout, 4);
     dom.metricStraightness.textContent = format(model.straightness, 3);
     dom.epochDelta.textContent = `${signed(rolloutDelta, 3)} rollout MSE AUC`;
-    dom.dynamicsReadout.textContent = `At epoch ${state.epoch}, RLD changes rollout MSE AUC by ${signed(rolloutDelta, 3)} and temporal straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across epochs 1–10, validation-prediction AUC is 0.00753 for RLD vs 0.00979 for direct prediction.`;
+    dom.dynamicsReadout.textContent = `At epoch ${state.epoch}, RLT changes rollout MSE AUC by ${signed(rolloutDelta, 3)} and temporal straightness by ${signed(straightnessDelta, 3)} relative to direct prediction. Across epochs 1–10, validation-prediction AUC is 0.00753 for RLT vs 0.00979 for direct prediction.`;
     if (state.dynamicsModel === "residual") {
       dom.latentEquation.innerHTML = "<span>ẑ<sub>t+1</sub></span><b>=</b><span>z<sub>t</sub></span><b>+</b><span class=\"equation-accent\">Δẑ<sub>t</sub></span>";
     } else {
